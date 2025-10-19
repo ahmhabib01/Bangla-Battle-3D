@@ -1,424 +1,804 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bangla Battle 3D - Ultimate Bangladesh Edition</title>
+    <title>Bangla Battle 3D - বাংলাদেশের প্রথম 3D গেম</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
     <style>
+        :root {
+            --primary: #e74c3c;
+            --secondary: #f39c12;
+            --accent: #2ecc71;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --bg-gradient: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Hind Siliguri', 'Segoe UI', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            color: white;
-            overflow: hidden;
-            height: 100vh;
+            background: var(--bg-gradient);
+            color: var(--light);
+            overflow-x: hidden;
+            min-height: 100vh;
         }
         
-        #gameContainer {
-            width: 100%;
-            height: 100%;
+        /* Header Styles */
+        header {
+            background: rgba(44, 62, 80, 0.9);
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             position: relative;
+            z-index: 100;
         }
         
-        /* Main Menu Styles */
-        #mainMenu {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header-content {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            z-index: 10;
-            transition: opacity 0.5s;
         }
         
         .logo {
-            font-size: 4rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 10px #ff6b01, 0 0 20px #ff6b01;
-            background: linear-gradient(to right, #ff6b01, #f9d423);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--secondary);
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--secondary), var(--primary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
-        .subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 3rem;
-            text-align: center;
-            color: #f9d423;
+        .logo-subtitle {
+            font-size: 0.9rem;
+            color: var(--light);
+            opacity: 0.8;
         }
         
-        .menu-buttons {
+        .nav-links {
             display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            width: 300px;
+            gap: 20px;
         }
         
-        .menu-btn {
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #ff6b01, #f9d423);
+        .nav-link {
+            color: var(--light);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 2rem 0;
+            min-height: 80vh;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Home Page */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 12px 30px;
             border: none;
             border-radius: 50px;
-            color: #1a2a6c;
-            font-size: 1.2rem;
-            font-weight: bold;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            text-align: center;
-        }
-        
-        .menu-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .menu-btn.secondary {
-            background: transparent;
-            border: 2px solid #f9d423;
-            color: #f9d423;
-        }
-        
-        /* Character Selection */
-        #characterSelection {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
+            transition: all 0.3s;
+            display: inline-flex;
             align-items: center;
-            z-index: 9;
+            gap: 10px;
         }
         
-        .characters-grid {
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .features {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 2rem 0;
-            max-width: 800px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 4rem;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Game Page */
+        .game-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 2rem;
+        }
+        
+        .game-canvas-container {
+            flex: 2;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        #gameCanvas {
+            width: 100%;
+            height: 500px;
+            display: block;
+        }
+        
+        .game-controls {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .control-section {
+            margin-bottom: 25px;
+        }
+        
+        .control-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 8px;
+        }
+        
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
         }
         
         .character-card {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             cursor: pointer;
-            transition: transform 0.3s, background 0.3s;
+            transition: all 0.3s;
         }
         
         .character-card:hover {
-            transform: scale(1.05);
             background: rgba(255, 255, 255, 0.2);
         }
         
-        .character-card.selected {
-            background: rgba(255, 107, 1, 0.3);
-            border: 2px solid #ff6b01;
+        .character-card.active {
+            background: var(--primary);
         }
         
         .character-icon {
-            font-size: 3rem;
+            font-size: 2.5rem;
             margin-bottom: 10px;
         }
         
         .character-name {
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-weight: 600;
         }
         
-        .character-desc {
-            font-size: 0.8rem;
-            color: #ccc;
-        }
-        
-        /* Game UI */
-        #gameUI {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 5;
-        }
-        
-        .hud {
-            padding: 20px;
+        .stats {
             display: flex;
             justify-content: space-between;
+            margin-top: 20px;
         }
         
-        .health-bar {
-            width: 200px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .health-fill {
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(to right, #ff6b01, #f9d423);
-            transition: width 0.3s;
-        }
-        
-        .coins {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #f9d423;
-        }
-        
-        .mini-map {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 150px;
-            height: 150px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            border: 2px solid #f9d423;
-        }
-        
-        .mission-info {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
-            border-radius: 10px;
-            max-width: 300px;
-        }
-        
-        .mission-title {
-            font-weight: bold;
-            color: #ff6b01;
-            margin-bottom: 5px;
-        }
-        
-        /* About Us Page */
-        #aboutPage {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 11;
+        .stat {
             text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Maps Page */
+        .maps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 2rem;
+        }
+        
+        .map-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .map-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .map-image {
+            height: 180px;
+            background: linear-gradient(135deg, #3498db, #9b59b6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .map-content {
             padding: 20px;
         }
         
+        .map-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+        
+        .map-desc {
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+        
+        .map-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .map-feature {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        /* About Page */
         .about-content {
-            max-width: 600px;
+            display: flex;
+            gap: 40px;
+            margin-top: 2rem;
+            align-items: center;
+        }
+        
+        .developer-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            flex: 1;
         }
         
         .developer-photo {
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ff6b01, #f9d423);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             margin: 0 auto 20px;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             font-size: 3rem;
+            color: white;
             cursor: pointer;
+            transition: transform 0.3s;
         }
         
-        .back-btn {
-            margin-top: 30px;
-            padding: 10px 20px;
-            background: transparent;
-            border: 2px solid #f9d423;
-            color: #f9d423;
-            border-radius: 50px;
-            cursor: pointer;
+        .developer-photo:hover {
+            transform: scale(1.05);
         }
         
-        /* Game Canvas */
-        #gameCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        .developer-name {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .developer-title {
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+        
+        .about-text {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        .about-text h2 {
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .about-text p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        /* Footer */
+        footer {
+            background: rgba(44, 62, 80, 0.9);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .footer-link {
+            color: var(--light);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-link:hover {
+            color: var(--secondary);
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            .about-content {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="gameContainer">
-        <!-- Main Menu -->
-        <div id="mainMenu">
-            <div class="logo">Bangla Battle 3D</div>
-            <div class="subtitle">Ultimate Bangladesh Edition</div>
-            <div class="menu-buttons">
-                <button class="menu-btn" id="playBtn">Play Game</button>
-                <button class="menu-btn secondary" id="multiplayerBtn">Multiplayer</button>
-                <button class="menu-btn secondary" id="profileBtn">Profile</button>
-                <button class="menu-btn secondary" id="aboutBtn">About Us</button>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🎮</div>
+                    <div>
+                        <div class="logo-text">Bangla Battle 3D</div>
+                        <div class="logo-subtitle">বাংলাদেশের প্রথম 3D গেম</div>
+                    </div>
+                </div>
+                <div class="nav-links">
+                    <a href="#" class="nav-link active" data-page="home">হোম</a>
+                    <a href="#" class="nav-link" data-page="game">গেম</a>
+                    <a href="#" class="nav-link" data-page="maps">ম্যাপ</a>
+                    <a href="#" class="nav-link" data-page="about">আমাদের সম্পর্কে</a>
+                </div>
             </div>
         </div>
-        
-        <!-- Character Selection -->
-        <div id="characterSelection">
-            <h2>Select Your Character</h2>
-            <div class="characters-grid">
-                <div class="character-card" data-char="major">
-                    <div class="character-icon">💂</div>
-                    <div class="character-name">Major Naim</div>
-                    <div class="character-desc">Army commando with drone strike</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Home Page -->
+            <div class="page active" id="home">
+                <div class="hero">
+                    <h1 class="hero-title">Bangla Battle 3D</h1>
+                    <p class="hero-subtitle">বাংলাদেশের ৮টি বিভাগে রোমাঞ্চকর যুদ্ধ!</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" data-page="game">
+                            <i class="fas fa-play"></i> গেম শুরু করুন
+                        </button>
+                        <button class="btn btn-secondary" data-page="maps">
+                            <i class="fas fa-map"></i> ম্যাপ দেখুন
+                        </button>
+                    </div>
                 </div>
-                <div class="character-card" data-char="polash">
-                    <div class="character-icon">🚤</div>
-                    <div class="character-name">Polash</div>
-                    <div class="character-desc">Boatman turned warrior</div>
-                </div>
-                <div class="character-card" data-char="rokeya">
-                    <div class="character-icon">📚</div>
-                    <div class="character-name">Rokeya</div>
-                    <div class="character-desc">Teacher with book blast attack</div>
-                </div>
-                <div class="character-card" data-char="bhombol">
-                    <div class="character-icon">🚌</div>
-                    <div class="character-name">Bhombol Mia</div>
-                    <div class="character-desc">Bus driver with horn stun</div>
-                </div>
-                <div class="character-card" data-char="shorna">
-                    <div class="character-icon">📸</div>
-                    <div class="character-name">Shorna</div>
-                    <div class="character-desc">Journalist with flashbang camera</div>
-                </div>
-                <div class="character-card" data-char="farid">
-                    <div class="character-icon">🐟</div>
-                    <div class="character-name">Farid Bhai</div>
-                    <div class="character-desc">Fish market king with hilsha launcher</div>
+                
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">🗺️</div>
+                        <h3 class="feature-title">৮টি বিভাগীয় ম্যাপ</h3>
+                        <p>ঢাকা, চট্টগ্রাম, সিলেট, রাজশাহী, খুলনা, রংপুর, বরিশাল ও ময়মনসিংহ বিভাগের রিয়েলিস্টিক ম্যাপ</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <h3 class="feature-title">বিশেষ চরিত্র</h3>
+                        <p>মেজর নাঈম, পলাশ, রোকেয়া, ভোম্বল মিয়া, শর্না ও ফরিদ ভাইয়ের মতো ইউনিক চরিত্র</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3 class="feature-title">বিভিন্ন গেম মোড</h3>
+                        <p>মাল্টিপ্লেয়ার, ক্যাম্পেইন ও অফলাইন মোডে খেলুন। ২০ জন প্লেয়ারের সাথে প্রতিযোগিতা করুন</p>
+                    </div>
                 </div>
             </div>
-            <button class="menu-btn" id="startGameBtn">Start Battle</button>
-            <button class="back-btn" id="backToMenuBtn">Back to Menu</button>
+            
+            <!-- Game Page -->
+            <div class="page" id="game">
+                <h2>গেম প্লে</h2>
+                <p>নিচের ক্যানভাসে গেমটি দেখানো হচ্ছে। চরিত্র নির্বাচন করুন এবং গেম শুরু করুন।</p>
+                
+                <div class="game-container">
+                    <div class="game-canvas-container">
+                        <canvas id="gameCanvas"></canvas>
+                    </div>
+                    <div class="game-controls">
+                        <div class="control-section">
+                            <h3 class="control-title">চরিত্র নির্বাচন</h3>
+                            <div class="character-grid">
+                                <div class="character-card active" data-char="major">
+                                    <div class="character-icon">💂</div>
+                                    <div class="character-name">মেজর নাঈম</div>
+                                </div>
+                                <div class="character-card" data-char="polash">
+                                    <div class="character-icon">🚤</div>
+                                    <div class="character-name">পলাশ</div>
+                                </div>
+                                <div class="character-card" data-char="rokeya">
+                                    <div class="character-icon">📚</div>
+                                    <div class="character-name">রোকেয়া</div>
+                                </div>
+                                <div class="character-card" data-char="bhombol">
+                                    <div class="character-icon">🚌</div>
+                                    <div class="character-name">ভোম্বল মিয়া</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="control-section">
+                            <h3 class="control-title">গেম স্ট্যাটাস</h3>
+                            <div class="stats">
+                                <div class="stat">
+                                    <div class="stat-value">৮৫%</div>
+                                    <div class="stat-label">স্বাস্থ্য</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">১,২৫০</div>
+                                    <div class="stat-label">কয়েন</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">১২</div>
+                                    <div class="stat-label">লেভেল</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="control-section">
+                            <h3 class="control-title">নিয়ন্ত্রণ</h3>
+                            <p>W, A, S, D - চলাচল</p>
+                            <p>স্পেস বার - লাফানো</p>
+                            <p>মাউস - দৃষ্টি নিয়ন্ত্রণ</p>
+                            <p>ক্লিক - অ্যাটাক</p>
+                        </div>
+                        
+                        <button class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-play"></i> গেম শুরু করুন
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Maps Page -->
+            <div class="page" id="maps">
+                <h2>গেম ম্যাপসমূহ</h2>
+                <p>বাংলাদেশের ৮টি বিভাগ ভিত্তিক বিশেষ ডিজাইনের ম্যাপ</p>
+                
+                <div class="maps-grid">
+                    <div class="map-card">
+                        <div class="map-image" style="background: linear-gradient(135deg, #e74c3c, #e67e22);">
+                            <i class="fas fa-city"></i>
+                        </div>
+                        <div class="map-content">
+                            <h3 class="map-title">ঢাকা বিভাগ</h3>
+                            <p class="map-desc">"সিটি অফ কাওস" - মোটিঝিল, ধানমন্ডি, মিরপুর স্টেডিয়াম</p>
+                            <div class="map-features">
+                                <span class="map-feature">রিকশা রেস্কিউ</span>
+                                <span class="map-feature">মেলা ক্ল্যাশ</span>
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%;">বাছাই করুন</button>
+                        </div>
+                    </div>
+                    
+                    <div class="map-card">
+                        <div class="map-image" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <div class="map-content">
+                            <h3 class="map-title">চট্টগ্রাম বিভাগ</h3>
+                            <p class="map-desc">"হিল অ্যান্ড হারবার হ্যাভক" - কাপ্তাই লেক, চট্টগ্রাম পোর্ট</p>
+                            <div class="map-features">
+                                <span class="map-feature">পোর্ট কন্ট্রোল</span>
+                                <span class="map-feature">শিপইয়ার্ড শোডাউন</span>
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%;">বাছাই করুন</button>
+                        </div>
+                    </div>
+                    
+                    <div class="map-card">
+                        <div class="map-image" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <div class="map-content">
+                            <h3 class="map-title">সিলেট বিভাগ</h3>
+                            <p class="map-desc">"টি হিল শোডাউন" - মালনীছড়া চা বাগান, রেলওয়ে ব্রিজ</p>
+                            <div class="map-features">
+                                <span class="map-feature">টি এস্টেট ক্যাপচার</span>
+                                <span class="map-feature">সাইলেন্ট হিল আমবুশ</span>
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%;">বাছাই করুন</button>
+                        </div>
+                    </div>
+                    
+                    <div class="map-card">
+                        <div class="map-image" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="map-content">
+                            <h3 class="map-title">সুন্দরবন</h3>
+                            <p class="map-desc">"সুন্দরবন সারভাইভাল" - বিশ্বের বৃহত্তম ম্যানগ্রোভ বন</p>
+                            <div class="map-features">
+                                <span class="map-feature">বাঘ রেস্কিউ</span>
+                                <span class="map-feature">ম্যানগ্রোভ ডিফেন্স</span>
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%;">বাছাই করুন</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- About Page -->
+            <div class="page" id="about">
+                <h2>আমাদের সম্পর্কে</h2>
+                <p>বাংলা ব্যাটল 3D বাংলাদেশের প্রথম পূর্ণাঙ্গ 3D গেম</p>
+                
+                <div class="about-content">
+                    <div class="developer-card">
+                        <div class="developer-photo" id="devPhoto">
+                            AH
+                        </div>
+                        <h3 class="developer-name">AHM Habib</h3>
+                        <p class="developer-title">গেম ডেভেলপার - বাংলাদেশে তৈরি</p>
+                        <p>ইমেইল: contact@banglabattle.com</p>
+                        <p>ওয়েবসাইট: www.banglabattle.com</p>
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-primary">
+                                <i class="fab fa-facebook"></i> ফেসবুক
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="about-text">
+                        <h2>বাংলা ব্যাটল 3D এর ইতিহাস</h2>
+                        <p>বাংলা ব্যাটল 3D হল বাংলাদেশের প্রথম পূর্ণাঙ্গ 3D ভিডিও গেম যা দেশের ৮টি বিভাগের উপর ভিত্তি করে তৈরি। গেমটিতে বাংলাদেশের সংস্কৃতি, ঐতিহ্য ও স্থাপত্যকে অত্যন্ত সুন্দরভাবে ফুটিয়ে তোলা হয়েছে।</p>
+                        
+                        <p>গেমটি তৈরি করতে আমাদের দলকে অনেক চ্যালেঞ্জ মোকাবেলা করতে হয়েছে। বাংলাদেশের বিভিন্ন অঞ্চলের ম্যাপ ডিজাইন, চরিত্র তৈরি এবং গেমপ্লে মেকানিক্স ডেভেলপ করতে আমাদের ২ বছরের বেশি সময় লেগেছে।</p>
+                        
+                        <h3 style="margin-top: 20px;">আমাদের দল</h3>
+                        <p>ডিজাইনার: রহমান খান</p>
+                        <p>আর্টিস্ট: ফাতিমা বেগম</p>
+                        <p>সাউন্ড ইঞ্জিনিয়ার: জামাল হোসেন</p>
+                        <p>প্রোগ্রামার: AHM Habib</p>
+                        
+                        <p style="margin-top: 20px; font-style: italic;">"এই গেমটি আমাদের সুন্দর বাংলাদেশের প্রতি একটি শ্রদ্ধাঞ্জলি — এর মানুষ, এর হাসি-ঠাট্টা এবং ঐক্যের চেতনার প্রতি।"</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <!-- About Us Page -->
-        <div id="aboutPage">
-            <div class="about-content">
-                <div class="developer-photo" id="devPhoto">AH</div>
-                <h2>AHM Habib</h2>
-                <p>Game Developer - Made in Bangladesh</p>
-                <p>Email: contact@banglabattle.com</p>
-                <p>Website: www.banglabattle.com</p>
-                <div style="margin: 20px 0;">
-                    <h3>Credits</h3>
-                    <p>Designer: Rahman Khan</p>
-                    <p>Artist: Fatima Begum</p>
-                    <p>Sound Engineer: Jamal Hossain</p>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Bangla Battle 3D</div>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">গোপনীয়তা নীতি</a>
+                    <a href="#" class="footer-link">সেবার শর্তাবলী</a>
+                    <a href="#" class="footer-link">সাহায্য</a>
+                    <a href="#" class="footer-link">যোগাযোগ</a>
                 </div>
-                <p>"This game is a tribute to our beautiful Bangladesh — its people, its humor, and its spirit of unity."</p>
-                <button class="back-btn" id="backFromAboutBtn">Back to Menu</button>
+            </div>
+            <div class="copyright">
+                &copy; ২০২৩ Bangla Battle 3D. সকল অধিকার সংরক্ষিত।
             </div>
         </div>
-        
-        <!-- Game UI -->
-        <div id="gameUI">
-            <div class="hud">
-                <div class="health-bar">
-                    <div class="health-fill" id="healthFill"></div>
-                </div>
-                <div class="coins" id="coinsDisplay">Coins: 1200</div>
-            </div>
-            <div class="mini-map"></div>
-            <div class="mission-info">
-                <div class="mission-title">Mission: Save the Rickshaw Puller</div>
-                <div>Location: Motijheel, Dhaka</div>
-                <div>Find the rickshaw puller and protect him from attackers</div>
-            </div>
-        </div>
-        
-        <!-- 3D Game Canvas -->
-        <canvas id="gameCanvas"></canvas>
-    </div>
+    </footer>
 
     <script>
-        // UI Navigation
-        document.getElementById('playBtn').addEventListener('click', function() {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('characterSelection').style.display = 'flex';
+        // Navigation
+        document.querySelectorAll('.nav-link, .btn[data-page]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const pageId = this.getAttribute('data-page');
+                
+                // Update active nav link
+                document.querySelectorAll('.nav-link').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Show selected page
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                document.getElementById(pageId).classList.add('active');
+            });
         });
         
-        document.getElementById('aboutBtn').addEventListener('click', function() {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('aboutPage').style.display = 'flex';
+        // Character selection
+        document.querySelectorAll('.character-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.character-card').forEach(c => {
+                    c.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
         });
         
-        document.getElementById('backToMenuBtn').addEventListener('click', function() {
-            document.getElementById('characterSelection').style.display = 'none';
-            document.getElementById('mainMenu').style.display = 'flex';
-        });
-        
-        document.getElementById('backFromAboutBtn').addEventListener('click', function() {
-            document.getElementById('aboutPage').style.display = 'none';
-            document.getElementById('mainMenu').style.display = 'flex';
-        });
-        
+        // Developer photo click
         document.getElementById('devPhoto').addEventListener('click', function() {
             window.open('https://facebook.com/banglabattle', '_blank');
         });
         
-        // Character Selection
-        let selectedCharacter = null;
-        const characterCards = document.querySelectorAll('.character-card');
-        
-        characterCards.forEach(card => {
-            card.addEventListener('click', function() {
-                characterCards.forEach(c => c.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedCharacter = this.getAttribute('data-char');
-            });
-        });
-        
-        document.getElementById('startGameBtn').addEventListener('click', function() {
-            if (!selectedCharacter) {
-                alert('Please select a character first!');
-                return;
-            }
-            
-            document.getElementById('characterSelection').style.display = 'none';
-            startGame(selectedCharacter);
-        });
-        
         // Three.js Game Implementation
-        function startGame(character) {
-            // Set up Three.js scene
+        function initGame() {
+            const canvas = document.getElementById('gameCanvas');
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gameCanvas'), antialias: true });
+            const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
             
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x87CEEB); // Sky blue
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setClearColor(0x87CEEB);
             
-            // Add lighting
+            // Lighting
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
             
@@ -426,18 +806,18 @@
             directionalLight.position.set(10, 20, 5);
             scene.add(directionalLight);
             
-            // Create ground
+            // Ground
             const groundGeometry = new THREE.PlaneGeometry(50, 50);
             const groundMaterial = new THREE.MeshLambertMaterial({ color: 0x3a8c3a });
             const ground = new THREE.Mesh(groundGeometry, groundMaterial);
             ground.rotation.x = -Math.PI / 2;
             scene.add(ground);
             
-            // Add some buildings (Dhaka city environment)
+            // Buildings (Dhaka city)
             const buildingGeometry = new THREE.BoxGeometry(4, 8, 4);
             const buildingMaterial = new THREE.MeshLambertMaterial({ color: 0xaaaaaa });
             
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 15; i++) {
                 const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
                 building.position.x = (Math.random() - 0.5) * 40;
                 building.position.z = (Math.random() - 0.5) * 40;
@@ -445,62 +825,33 @@
                 scene.add(building);
             }
             
-            // Add a rickshaw (mission objective)
+            // Rickshaw (mission objective)
             const rickshawGeometry = new THREE.BoxGeometry(3, 1.5, 1.5);
             const rickshawMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
             const rickshaw = new THREE.Mesh(rickshawGeometry, rickshawMaterial);
             rickshaw.position.set(15, 0.75, 15);
             scene.add(rickshaw);
             
-            // Create player based on selected character
-            let playerGeometry, playerMaterial;
-            
-            switch(character) {
-                case 'major':
-                    playerGeometry = new THREE.BoxGeometry(1, 2, 1);
-                    playerMaterial = new THREE.MeshLambertMaterial({ color: 0x006600 });
-                    break;
-                case 'polash':
-                    playerGeometry = new THREE.BoxGeometry(1, 2, 1);
-                    playerMaterial = new THREE.MeshLambertMaterial({ color: 0x0000ff });
-                    break;
-                case 'rokeya':
-                    playerGeometry = new THREE.BoxGeometry(1, 2, 1);
-                    playerMaterial = new THREE.MeshLambertMaterial({ color: 0xff00ff });
-                    break;
-                case 'bhombol':
-                    playerGeometry = new THREE.BoxGeometry(1.2, 2, 1);
-                    playerMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00 });
-                    break;
-                case 'shorna':
-                    playerGeometry = new THREE.BoxGeometry(1, 2, 1);
-                    playerMaterial = new THREE.MeshLambertMaterial({ color: 0x00ffff });
-                    break;
-                case 'farid':
-                    playerGeometry = new THREE.BoxGeometry(1.2, 2, 1.2);
-                    playerMaterial = new THREE.MeshLambertMaterial({ color: 0xff6600 });
-                    break;
-            }
-            
+            // Player
+            const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
+            const playerMaterial = new THREE.MeshLambertMaterial({ color: 0x006600 });
             const player = new THREE.Mesh(playerGeometry, playerMaterial);
             player.position.y = 1;
             scene.add(player);
             
-            // Set up camera to follow player
+            // Camera setup
             camera.position.set(0, 10, 10);
             camera.lookAt(player.position);
             
-            // Add controls
+            // Controls
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.target = player.position;
             controls.update();
             
             // Game state
-            let coins = 1200;
-            let health = 100;
             const keys = {};
             
-            // Handle keyboard input
+            // Keyboard input
             document.addEventListener('keydown', (event) => {
                 keys[event.key] = true;
             });
@@ -530,15 +881,6 @@
                 // Keep player on ground
                 player.position.y = 1;
                 
-                // Check if player reached the rickshaw
-                const distanceToRickshaw = player.position.distanceTo(rickshaw.position);
-                if (distanceToRickshaw < 3) {
-                    document.querySelector('.mission-title').textContent = "Mission Complete!";
-                    document.querySelector('.mission-info div:nth-child(3)').textContent = "Return to base for next mission";
-                    coins += 100;
-                    document.getElementById('coinsDisplay').textContent = `Coins: ${coins}`;
-                }
-                
                 // Update camera position to follow player
                 camera.position.x = player.position.x;
                 camera.position.z = player.position.z + 10;
@@ -552,11 +894,14 @@
             
             // Handle window resize
             window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.aspect = canvas.clientWidth / canvas.clientHeight;
                 camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
             });
         }
+        
+        // Initialize game when page loads
+        window.addEventListener('load', initGame);
     </script>
 </body>
 </html>
