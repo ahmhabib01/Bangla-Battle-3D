@@ -1,0 +1,6 @@
+MainMenu UI Layout - Wiring:
+ - Canvas -> attach MainMenuController (Assets/BanglaBattle3D/Scripts/UI/MainMenuController.cs)
+ - Footer Text -> assign a UI Text component reference to MainMenuController.footerText
+ - Background Image -> set to Assets/BanglaBattle3D/Art/Maps/MenuBackground_MapBlur.png
+ - Buttons: Play -> PlayButton, Profile -> ProfileButton, AboutUs -> AboutUsButton, Exit -> QuitGame
+ - Create an empty GameObject 'AudioManager', attach Assets/BanglaBattle3D/Scripts/Managers/AudioManager.cs and assign calm_cinematic_bangla_loop.mp3

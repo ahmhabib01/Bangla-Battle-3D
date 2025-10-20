@@ -1,0 +1,5 @@
+Profile UI Layout - Wiring:
+ - Canvas -> attach ProfileController (Assets/BanglaBattle3D/Scripts/UI/ProfileController.cs)
+ - Name InputField -> assign to ProfileController.nameInput
+ - Profile RawImage -> assign to ProfileController.profileImage
+ - Save Button -> call ProfileController.SaveProfile

@@ -1,0 +1,5 @@
+Lobby UI Layout - Wiring:
+ - Canvas -> attach LobbyController (Assets/BanglaBattle3D/Scripts/UI/LobbyController.cs)
+ - ModeText (UI Text) -> assign to LobbyController.modeText
+ - Buttons: SetModeOffline -> SetModeOffline, SetModeOnline -> SetModeOnline
+ - Create Room / Join Room -> call PhotonManager.CreateRoom/JoinRoom
